@@ -15,6 +15,7 @@ local pesdePackageFolder: {
 	roblox_packages = true,
 	luau_packages = true,
 	lune_packages = true,
+	[".pesde"] = true,
 }
 
 local requiredPackages = {}
@@ -128,8 +129,10 @@ local result = process.spawn("stylua", { "--check", sourceFiles }, {
 	stdio = "default",
 })
 
-if result.stdout == "" then
-	print("clean!")
-elseif stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
-	process.spawn("stylua", { sourceFiles }, spawnOptions)
+if result.ok then
+	if result.stdout == "" then
+		print("clean!")
+	elseif stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
+		process.spawn("stylua", { sourceFiles }, spawnOptions)
+	end
 end
