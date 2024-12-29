@@ -35,7 +35,12 @@ local missingPackages = {}
 
 for _, package in requiredPackages do
 	local found = false
-	for _, dep in pesdeManifest.dev_dependencies do
+	local devDependencies = pesdeManifest.dev_dependencies
+	if not devDependencies then
+		devDependencies = {}
+		pesdeManifest.dev_dependencies = devDependencies
+	end
+	for _, dep in devDependencies do
 		if dep.name == package then
 			found = true
 			break
