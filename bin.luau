@@ -1,108 +1,33 @@
-local pathfs = require("lune_packages/pathfs")
+local pathfs = require("./lune_packages/pathfs")
 local serde = require("@lune/serde")
 local stdio = require("@lune/stdio")
 local process = require("@lune/process")
-
-local REQUIRED_TOOLINGS = {
-	"selene",
-	"luau_lsp",
-	"stylua",
-}
-
-local pesdePackageFolder: {
-	[string]: boolean,
-} = {
-	roblox_packages = true,
-	luau_packages = true,
-	lune_packages = true,
-	[".pesde"] = true,
-}
-
-local requiredPackages = {}
-
-for i, v in REQUIRED_TOOLINGS do
-	requiredPackages[i] = "pesde/" .. v
-end
+local dirs = require("./lune_packages/dirs")
+local net = require("@lune/net")
 
 local pesdeManifest: {
-	dev_dependencies: {
-		[string]: { name: string? },
+	target: {
+		environment: "roblox" | "luau" | "lune",
+		lib: string?,
+		bin: string?,
+		build_files: { string }?,
 	},
 } =
 	serde.decode("toml", pathfs.readFile("pesde.toml"))
 
-local missingPackages = {}
-
-for _, package in requiredPackages do
-	local found = false
-	local devDependencies = pesdeManifest.dev_dependencies
-	if not devDependencies then
-		devDependencies = {}
-		pesdeManifest.dev_dependencies = devDependencies
-	end
-	for _, dep in devDependencies do
-		if dep.name == package then
-			found = true
-			break
-		end
-	end
-	if found then
-		continue
-	end
-	table.insert(missingPackages, package)
+local sources: { string } = {}
+local target = pesdeManifest.target
+if target.bin then
+	table.insert(sources, target.bin)
 end
-
-if #missingPackages > 0 then
-	print("The following required development dependencies are missing:")
-	for _, v in missingPackages do
-		print(`\t> {v}`)
-	end
-	print()
-	if stdio.prompt("confirm", "Would you like to install these missing packages?") then
-		for _, v in missingPackages do
-			process.spawn("pesde", { "add", "--dev", v, "-t", "lune" })
-		end
-		local result = process.spawn("pesde", { "install" })
-		if not result.ok then
-			error("pesde failed to install packages. Aborting")
-		end
+if target.lib then
+	table.insert(sources, target.lib)
+end
+if target.build_files then
+	for _, v in target.build_files do
+		table.insert(sources, v)
 	end
 end
-
-local sources = {}
-
-local function scan(dirPath: pathfs.AsPath)
-	for _, path in pathfs.readDir(dirPath) do
-		path = pathfs.getNoCurDirPathOf(pathfs.Path.from(dirPath):join(path))
-
-		local isPesdePackageFolder = false
-		for folderName in pesdePackageFolder do
-			if path:equal(pathfs.Path.from(folderName)) then
-				isPesdePackageFolder = true
-				break
-			end
-		end
-		if isPesdePackageFolder then
-			continue
-		end
-
-		if path:equal(pathfs.Path.from("lune_packages")) then
-			continue
-		end
-		if path:equal(pathfs.Path.from("roblox_packages")) then
-			continue
-		end
-		if pathfs.isDir(path) then
-			scan(path)
-		elseif pathfs.isFile(path) then
-			if path:extension() == "luau" or path:extension() == "lua" then
-				table.insert(sources, path:toString())
-			end
-		end
-	end
-end
-
-scan(".")
 
 local sourceFiles = table.concat(sources, " ")
 
@@ -121,8 +46,35 @@ print()
 stdio.write(stdio.color("cyan"))
 print("[luau-lsp]")
 stdio.write(stdio.color("reset"))
-process.spawn("luau_lsp", { "analyze", sourceFiles }, spawnOptions)
+
+local luauLspParams = {
+	"analyze",
+}
+local tempDir = dirs.createTempDir()
+if pesdeManifest.target.environment == "roblox" then
+	local globalTypes =
+		net.request("https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/master/scripts/globalTypes.d.luau")
+	if not globalTypes.ok then
+		stdio.ewrite(globalTypes.body)
+		return process.exit(1)
+	end
+	local globalTypesFilePath = tempDir:join("globalTypes.d.luau")
+	pathfs.writeFile(globalTypesFilePath, globalTypes.body)
+
+	table.insert(luauLspParams, "--defs")
+	table.insert(luauLspParams, globalTypesFilePath:toString())
+
+	if pathfs.isFile("sourcemap.json") then
+		table.insert(luauLspParams, "--sourcemap")
+		table.insert(luauLspParams, "sourcemap.json")
+	end
+end
+
+table.insert(luauLspParams, sourceFiles)
+
+process.spawn("luau_lsp", luauLspParams, spawnOptions)
 print()
+pathfs.removeDir(tempDir)
 
 stdio.write(stdio.color("cyan"))
 print("[stylua]")
