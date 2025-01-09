@@ -1,7 +1,7 @@
 name = "jiwonz/luau_check"
-version = "0.1.4"
+version = "0.1.5"
 description = "Check and lint your luau project with recommended toolings such as selene, luau-lsp, and stylua"
-authors = ["jiwonz"]
+authors = ["jiwonz <me@jiwonz.kr>"]
 license = "MIT"
 repository = "https://github.com/jiwonz/luau_check.git"
 includes = ["README.md", "LICENSE.md", "bin.luau", "pesde.toml"]
