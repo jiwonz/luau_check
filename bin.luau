@@ -51,23 +51,22 @@ local luauLspParams = {
 	"analyze",
 }
 local tempDir = dirs.createTempDir()
-if pesdeManifest.target.environment == "roblox" then
-	local globalTypes =
-		net.request("https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/master/scripts/globalTypes.d.luau")
-	if not globalTypes.ok then
-		stdio.ewrite(globalTypes.body)
-		return process.exit(1)
-	end
-	local globalTypesFilePath = tempDir:join("globalTypes.d.luau")
-	pathfs.writeFile(globalTypesFilePath, globalTypes.body)
 
-	table.insert(luauLspParams, "--defs")
-	table.insert(luauLspParams, globalTypesFilePath:toString())
+local globalTypes =
+	net.request("https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/master/scripts/globalTypes.d.luau")
+if not globalTypes.ok then
+	stdio.ewrite(globalTypes.body)
+	return process.exit(1)
+end
+local globalTypesFilePath = tempDir:join("globalTypes.d.luau")
+pathfs.writeFile(globalTypesFilePath, globalTypes.body)
 
-	if pathfs.isFile("sourcemap.json") then
-		table.insert(luauLspParams, "--sourcemap")
-		table.insert(luauLspParams, "sourcemap.json")
-	end
+table.insert(luauLspParams, "--defs")
+table.insert(luauLspParams, globalTypesFilePath:toString())
+
+if pathfs.isFile("sourcemap.json") then
+	table.insert(luauLspParams, "--sourcemap")
+	table.insert(luauLspParams, "sourcemap.json")
 end
 
 table.insert(luauLspParams, sourceFiles)
@@ -87,9 +86,7 @@ local result = process.spawn("stylua", { "--check", sourceFiles }, {
 })
 
 if result.ok then
-	if result.stdout == "" then
-		print("clean!")
-	elseif stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
+	if result.stdout ~= "" and stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
 		process.spawn("stylua", { sourceFiles }, spawnOptions)
 	end
 end
