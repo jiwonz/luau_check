@@ -7,7 +7,7 @@ local net = require("@lune/net")
 
 local ERROR_PREFIX = `{stdio.color("red")}{stdio.style("bold")}error{stdio.color("reset")}:`
 
-local sources = process.args
+local sources = table.clone(process.args)
 if #sources < 1 and pathfs.isFile("pesde.toml") then
 	local pesdeManifest: {
 		target: {
