@@ -2,3 +2,4 @@ std = "luau"
 
 [lints]
 shadowing = "allow"
+global_usage = "allow"

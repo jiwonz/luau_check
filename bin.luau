@@ -5,28 +5,40 @@ local process = require("@lune/process")
 local dirs = require("./lune_packages/dirs")
 local net = require("@lune/net")
 
-local pesdeManifest: {
-	target: {
-		environment: "roblox" | "luau" | "lune",
-		lib: string?,
-		bin: string?,
-		build_files: { string }?,
-	},
-} =
-	serde.decode("toml", pathfs.readFile("pesde.toml"))
+local ERROR_PREFIX = `{stdio.color("red")}{stdio.style("bold")}error{stdio.color("reset")}:`
 
-local sources: { string } = {}
-local target = pesdeManifest.target
-if target.bin then
-	table.insert(sources, target.bin)
-end
-if target.lib then
-	table.insert(sources, target.lib)
-end
-if target.build_files then
-	for _, v in target.build_files do
-		table.insert(sources, v)
+local sources = process.args
+if #sources < 1 and _G.PESDE_ROOT then
+	local pesdeRootPath = pathfs.Path.from(_G.PESDE_ROOT)
+
+	local pesdeManifest: {
+		target: {
+			environment: "roblox" | "luau" | "lune",
+			lib: string?,
+			bin: string?,
+			build_files: { string }?,
+		},
+	} =
+		serde.decode("toml", pathfs.readFile(pesdeRootPath:join("pesde.toml")))
+
+	local target = pesdeManifest.target
+	if target.bin then
+		table.insert(sources, target.bin)
 	end
+	if target.lib then
+		table.insert(sources, target.lib)
+	end
+	if target.build_files then
+		for _, v in target.build_files do
+			table.insert(sources, v)
+		end
+	end
+end
+
+if #sources < 1 then
+	stdio.ewrite(`{ERROR_PREFIX} No input source was given.\n`)
+	process.exit(1)
+	error("unreachable")
 end
 
 local sourceFiles = table.concat(sources, " ")
