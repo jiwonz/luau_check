@@ -1,5 +1,5 @@
 name = "jiwonz/luau_check"
-version = "0.2.0"
+version = "0.2.1"
 description = "Check and lint your luau project with recommended toolings such as selene, luau-lsp, and stylua"
 authors = ["jiwonz <me@jiwonz.kr>"]
 license = "MIT"

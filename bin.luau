@@ -8,9 +8,7 @@ local net = require("@lune/net")
 local ERROR_PREFIX = `{stdio.color("red")}{stdio.style("bold")}error{stdio.color("reset")}:`
 
 local sources = process.args
-if #sources < 1 and _G.PESDE_ROOT then
-	local pesdeRootPath = pathfs.Path.from(_G.PESDE_ROOT)
-
+if #sources < 1 and pathfs.isFile("pesde.toml") then
 	local pesdeManifest: {
 		target: {
 			environment: "roblox" | "luau" | "lune",
@@ -19,7 +17,7 @@ if #sources < 1 and _G.PESDE_ROOT then
 			build_files: { string }?,
 		},
 	} =
-		serde.decode("toml", pathfs.readFile(pesdeRootPath:join("pesde.toml")))
+		serde.decode("toml", pathfs.readFile("pesde.toml"))
 
 	local target = pesdeManifest.target
 	if target.bin then
