@@ -8,11 +8,16 @@ local pesdeExec = require("./lune_packages/pesde_exec")
 
 local ERROR_PREFIX = `{stdio.color("red")}{stdio.style("bold")}error{stdio.color("reset")}:`
 
+local pesdeToml = pathfs.findFile(pathfs.script():join("pesde.toml"))
+if not pesdeToml then
+	stdio.ewrite(`{ERROR_PREFIX} pesde.toml not found.\n`)
+	return process.exit(1)
+end
+
 local sources = table.clone(process.args)
 if #sources < 1 then
 	stdio.ewrite(`{ERROR_PREFIX} No input source was given.\n`)
-	process.exit(1)
-	error("unreachable")
+	return process.exit(1)
 end
 
 local sourceFiles = table.concat(sources, " ")
@@ -26,7 +31,7 @@ local spawnOptions: process.SpawnOptions = {
 stdio.write(stdio.color("cyan"))
 print("[selene]")
 stdio.write(stdio.color("reset"))
-process.spawn("selene", { sourceFiles }, spawnOptions)
+pesdeExec(pesdeToml.path, "selene", { sourceFiles }, true)
 print()
 
 stdio.write(stdio.color("cyan"))
@@ -57,17 +62,17 @@ end
 
 table.insert(luauLspParams, sourceFiles)
 
-pesdeExec("luau_lsp", luauLspParams, true)
+pesdeExec(pesdeToml.path, "luau_lsp", luauLspParams, true)
 print()
 tempDir:removeDir()
 
 stdio.write(stdio.color("cyan"))
 print("[stylua]")
 stdio.write(stdio.color("reset"))
-local result = pesdeExec("stylua", { "--check", sourceFiles }, true)
+local result = pesdeExec(pesdeToml.path, "stylua", { "--check", sourceFiles }, true)
 
 if result.ok then
 	if result.stdout ~= "" and stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
-		pesdeExec("stylua", { sourceFiles }, true)
+		pesdeExec(pesdeToml.path, "stylua", { sourceFiles }, true)
 	end
 end
