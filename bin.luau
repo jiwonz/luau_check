@@ -8,7 +8,11 @@ local pesdeExec = require("./lune_packages/pesde_exec")
 
 local ERROR_PREFIX = `{stdio.color("red")}{stdio.style("bold")}error{stdio.color("reset")}:`
 
-local pesdeToml = pathfs.findFile(pathfs.script():join("pesde.toml"))
+local scriptParent = pathfs.script(2):parent()
+if not scriptParent then
+	error("unreachable")
+end
+local pesdeToml = pathfs.findFile(scriptParent:join("pesde.toml"))
 if not pesdeToml then
 	stdio.ewrite(`{ERROR_PREFIX} pesde.toml not found.\n`)
 	return process.exit(1)
@@ -22,11 +26,11 @@ end
 
 local sourceFiles = table.concat(sources, " ")
 
-local spawnOptions: process.SpawnOptions = {
-	cwd = process.cwd,
-	env = process.env,
-	stdio = "forward",
-}
+-- local spawnOptions: process.SpawnOptions = {
+-- 	cwd = process.cwd,
+-- 	env = process.env,
+-- 	stdio = "forward",
+-- }
 
 stdio.write(stdio.color("cyan"))
 print("[selene]")
