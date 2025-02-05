@@ -1,5 +1,5 @@
 name = "jiwonz/luau_check"
-version = "0.3.0"
+version = "0.3.1"
 target = "lune"
 
 [graph."0x5eal/unzip"."0.1.0 luau"]
@@ -36,7 +36,7 @@ lib = "src/init.luau"
 ref_ty = "pesde"
 name = "corecii/greentea"
 version = "0.4.11"
-index_url = "https://github.com/pesde-pkg/index"
+index_url = "https://github.com/daimond113/pesde-index"
 
 [graph."corecii/greentea"."0.4.11 lune".pkg_ref.target]
 environment = "lune"
