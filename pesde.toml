@@ -1,5 +1,5 @@
 name = "jiwonz/luau_check"
-version = "0.3.5"
+version = "0.3.6"
 description = "Check and lint your luau project with recommended toolings such as selene, luau-lsp, and stylua"
 authors = ["jiwonz <me@jiwonz.kr>"]
 license = "MIT"
@@ -21,4 +21,4 @@ stylua = { name = "pesde/stylua", version = "^2.0.2" }
 [dependencies]
 pathfs = { name = "jiwonz/pathfs", version = "^0.5.2" }
 dirs = { name = "jiwonz/dirs", version = "^0.3.0" }
-pesde_exec = { name = "jiwonz/pesde_exec", version = "^0.3.3" }
+pesde_exec = { name = "jiwonz/pesde_exec", version = "^0.4.2" }

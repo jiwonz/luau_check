@@ -16,16 +16,16 @@ end
 
 local sourceFiles = table.concat(sources, " ")
 
--- local spawnOptions: process.SpawnOptions = {
--- 	cwd = process.cwd,
--- 	env = process.env,
--- 	stdio = "forward",
--- }
+local spawnOptions: process.SpawnOptions = {
+	cwd = process.cwd,
+	env = process.env,
+	stdio = "forward",
+}
 
 stdio.write(stdio.color("cyan"))
 print("[selene]")
 stdio.write(stdio.color("reset"))
-pesdeExec("selene", { sourceFiles }, true)
+pesdeExec("selene", { sourceFiles }, spawnOptions)
 print()
 
 stdio.write(stdio.color("cyan"))
@@ -56,17 +56,21 @@ end
 
 table.insert(luauLspParams, sourceFiles)
 
-pesdeExec("luau_lsp", luauLspParams, true)
+pesdeExec("luau_lsp", luauLspParams, spawnOptions)
 print()
 tempDir:removeDir()
 
 stdio.write(stdio.color("cyan"))
 print("[stylua]")
 stdio.write(stdio.color("reset"))
-local result = pesdeExec("stylua", { "--check", sourceFiles }, true)
+local result = pesdeExec("stylua", { "--check", sourceFiles }, {
+	cwd = process.cwd,
+	env = process.env,
+	stdio = "default",
+})
 
 if result.ok then
 	if result.stdout ~= "" and stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
-		pesdeExec("stylua", { sourceFiles }, true)
+		pesdeExec("stylua", { sourceFiles }, spawnOptions)
 	end
 end
