@@ -1,5 +1,5 @@
 name = "jiwonz/luau_check"
-version = "0.3.6"
+version = "0.3.7"
 target = "lune"
 
 [graph."0x5eal/unzip@0.1.0 luau"]
@@ -20,7 +20,7 @@ resolved_ty = "standard"
 
 [graph."corecii/greentea@0.4.11 lune".pkg_ref]
 ref_ty = "pesde"
-index_url = "https://github.com/pesde-pkg/index"
+index_url = "https://github.com/daimond113/pesde-index"
 
 [graph."jiwonz/dirs@0.1.2 lune"]
 resolved_ty = "standard"
