@@ -63,8 +63,8 @@ tempDir:removeDir()
 stdio.write(stdio.color("cyan"))
 print("[stylua]")
 stdio.write(stdio.color("reset"))
-pesdeExec("stylua", { "--check", sourceFiles }, spawnOptions)
-local result = pesdeExec("stylua", { "--check", sourceFiles }, {
+pesdeExec("stylua", { "--syntax", "Luau", "--check", sourceFiles }, spawnOptions)
+local result = pesdeExec("stylua", { "--syntax", "Luau", "--check", sourceFiles }, {
 	cwd = process.cwd,
 	env = process.env,
 	stdio = "default",
