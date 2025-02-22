@@ -72,6 +72,6 @@ local result = pesdeExec("stylua", { "--check", sourceFiles }, {
 
 if result.ok then
 	if result.stdout ~= "" and stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
-		pesdeExec("stylua", { sourceFiles }, spawnOptions)
+		pesdeExec("stylua", { sourceFiles, "--syntax", "Luau" }, spawnOptions)
 	end
 end
