@@ -1,5 +1,5 @@
 name = "jiwonz/luau_check"
-version = "0.3.9"
+version = "0.3.10"
 target = "lune"
 
 [graph."0x5eal/unzip@0.1.1 luau"]
