@@ -15,11 +15,11 @@ default = "https://github.com/pesde-pkg/index"
 
 [engines]
 lune = "^0.8.9"
-pesde = "^0.6.0-rc.8"
+pesde = "^0.6.2"
 
 [peer_dependencies]
 selene = { name = "pesde/selene", version = "^0.28.0" }
-luau_lsp = { name = "pesde/luau_lsp", version = "^1.39.2" }
+luau_lsp = { name = "pesde/luau_lsp", version = "^1.40.0" }
 stylua = { name = "pesde/stylua", version = "^2.0.2" }
 
 [dependencies]

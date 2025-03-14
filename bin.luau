@@ -14,8 +14,6 @@ if #sources < 1 then
 	return process.exit(1)
 end
 
-local sourceFiles = table.concat(sources, " ")
-
 local spawnOptions: process.SpawnOptions = {
 	cwd = process.cwd,
 	env = process.env,
@@ -25,7 +23,7 @@ local spawnOptions: process.SpawnOptions = {
 stdio.write(stdio.color("cyan"))
 print("[selene]")
 stdio.write(stdio.color("reset"))
-pesdeExec("selene", { sourceFiles }, spawnOptions)
+pesdeExec("selene", { unpack(sources) }, spawnOptions)
 print()
 
 stdio.write(stdio.color("cyan"))
@@ -54,7 +52,9 @@ if fs.isFile("sourcemap.json") then
 	table.insert(luauLspParams, "sourcemap.json")
 end
 
-table.insert(luauLspParams, sourceFiles)
+for _, sourceFile in sources do
+	table.insert(luauLspParams, sourceFile)
+end
 
 pesdeExec("luau_lsp", luauLspParams, spawnOptions)
 print()
@@ -63,8 +63,8 @@ tempDir:removeDir()
 stdio.write(stdio.color("cyan"))
 print("[stylua]")
 stdio.write(stdio.color("reset"))
-pesdeExec("stylua", { "--syntax", "Luau", "--check", sourceFiles }, spawnOptions)
-local result = pesdeExec("stylua", { "--syntax", "Luau", "--check", sourceFiles }, {
+pesdeExec("stylua", { "--syntax", "Luau", "--check", unpack(sources) }, spawnOptions)
+local result = pesdeExec("stylua", { "--syntax", "Luau", "--check", unpack(sources) }, {
 	cwd = process.cwd,
 	env = process.env,
 	stdio = "default",
@@ -72,6 +72,6 @@ local result = pesdeExec("stylua", { "--syntax", "Luau", "--check", sourceFiles 
 
 if result.ok then
 	if result.stdout ~= "" and stdio.prompt("confirm", "Would you like stylua to format and fix your code?") then
-		pesdeExec("stylua", { "--syntax", "Luau", sourceFiles }, spawnOptions)
+		pesdeExec("stylua", { "--syntax", "Luau", unpack(sources) }, spawnOptions)
 	end
 end
