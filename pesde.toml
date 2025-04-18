@@ -1,5 +1,5 @@
 name = "jiwonz/luau_check"
-version = "0.3.12"
+version = "0.3.13"
 description = "Check and lint your luau project with recommended toolings such as selene, luau-lsp, and stylua"
 authors = ["jiwonz <me@jiwonz.kr>"]
 license = "MIT"
@@ -18,9 +18,9 @@ lune = "^0.8.9"
 pesde = "^0.6.2"
 
 [peer_dependencies]
-selene = { name = "pesde/selene", version = "^0.28.0" }
-luau_lsp = { name = "pesde/luau_lsp", version = "^1.40.0" }
-stylua = { name = "pesde/stylua", version = "^2.0.2" }
+selene = { name = "pesde/selene", version = "*" }
+luau_lsp = { name = "pesde/luau_lsp", version = "*" }
+stylua = { name = "pesde/stylua", version = "*" }
 
 [dependencies]
 pathfs = { name = "jiwonz/pathfs", version = "^0.6.0-rc.2" }
